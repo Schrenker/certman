@@ -3,15 +3,18 @@ package main
 //Certificate monitoring utility
 
 import (
+	"fmt"
+
 	"github.com/schrenker/certman/internal/jsonparse"
 )
 
 const usage = `Usage...`
 
 func main() {
-
-	jsonFile := jsonparse.LoadJSON("./configs/hosts.json")
-	jsonparse.ParseHostsJSON(jsonFile)
+	hosts, err := jsonparse.InitHostsJSON("./configs/hosts.json")
+	fmt.Println(hosts, err)
+	settings, err := jsonparse.InitSettingsJSON("./configs/settings.json")
+	fmt.Println(settings, err)
 }
 
 // func readHosts() //Read hosts from JSON file

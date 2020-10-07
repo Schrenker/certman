@@ -2,34 +2,61 @@ package jsonparse
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 )
 
-//LoadJSON is a function that loads json file
-func LoadJSON(path string) *os.File {
-	jsonFile, err := os.Open(path)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	return jsonFile
+//Settings is a struct representing all settings options available.
+type Settings struct {
+	Mail             string `json:"mail"`             //default nil
+	ConcurrencyLimit int    `json:"concurrencyLimit"` //default 10
 }
 
-//ParseHostsJSON parses json hosts file into string:[]string map
-func ParseHostsJSON(jsonFile *os.File) map[string][]string {
-	var hosts map[string][]string
+//InitSettingsJSON is a function that parses settings.json file to Settings struct
+func InitSettingsJSON(path string) (*Settings, error) {
+	var settings Settings
 
-	parsedJSONFile, _ := ioutil.ReadAll(jsonFile)
-
-	err := json.Unmarshal(parsedJSONFile, &hosts)
+	err := parseJSONFile(path, &settings)
 	if err != nil {
-		fmt.Println(err)
+		return &Settings{
+			Mail:             "",
+			ConcurrencyLimit: 10,
+		}, err
 	}
 
-	jsonFile.Close()
-	return hosts
+	return &settings, nil
+}
 
+//InitHostsJSON parses json hosts file into string:[]string map
+func InitHostsJSON(path string) (map[string][]string, error) {
+	var hosts map[string][]string
+
+	err := parseJSONFile(path, &hosts)
+	if err != nil {
+		return nil, err
+	}
+
+	return hosts, nil
+
+}
+
+//ParseJSON
+func parseJSONFile(path string, v interface{}) error {
+	jsonFile, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer jsonFile.Close()
+
+	parsedJSONFile, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(parsedJSONFile, &v)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
