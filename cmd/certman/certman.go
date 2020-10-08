@@ -12,14 +12,14 @@ import (
 const usage = `Usage...`
 
 func main() {
-	hosts, _ := jsonparse.InitHostsJSON("./configs/hosts.json")
-
-	settings, err := jsonparse.InitSettingsJSON("./configs/settings.json")
+	hosts, err := jsonparse.InitHostsJSON("./configs/hosts.json")
 	if err != nil {
-		os.Exit(20)
+		os.Exit(20) //code 20 mean no hosts file provided, which is required for program to run
 	}
 
-	queue.EnqueueHost(hosts, settings)
+	settings, _ := jsonparse.InitSettingsJSON("./configs/settings.json")
+
+	queue.EnqueueHosts(hosts, settings)
 }
 
 // func verifyHostname() //Check if hostname is valid and points to an actual server
