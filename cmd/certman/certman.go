@@ -3,21 +3,25 @@ package main
 //Certificate monitoring utility
 
 import (
-	"fmt"
+	"os"
 
 	"github.com/schrenker/certman/internal/jsonparse"
+	"github.com/schrenker/certman/internal/queue"
 )
 
 const usage = `Usage...`
 
 func main() {
-	hosts, err := jsonparse.InitHostsJSON("./configs/hosts.json")
-	fmt.Println(hosts, err)
+	hosts, _ := jsonparse.InitHostsJSON("./configs/hosts.json")
+
 	settings, err := jsonparse.InitSettingsJSON("./configs/settings.json")
-	fmt.Println(settings, err)
+	if err != nil {
+		os.Exit(20)
+	}
+
+	queue.EnqueueHost(hosts, settings)
 }
 
-// func readHosts() //Read hosts from JSON file
 // func verifyHostname() //Check if hostname is valid and points to an actual server
 // func verifyDomain() //Check if domain give is FQDN
 // func enqueueHosts() //Put hosts into queue
