@@ -1,7 +1,7 @@
 package queue
 
 import (
-	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/schrenker/certman/internal/certutils"
@@ -27,10 +27,18 @@ func EnqueueHosts(hosts map[string][]string, settings *jsonparse.Settings) {
 func launchConnection(hostname string, domains []string, wg *sync.WaitGroup, limit chan struct{}) {
 	defer wg.Done()
 
-	for _, domain := range domains {
-		date, _ := certutils.GetCertificateExpiryDate(hostname, domain, "443")
-		fmt.Printf("%v:%v:443 - %v\n", hostname, domain, date)
+	for _, v := range domains {
+		domain, port := splitDomainAndPort(v)
+		certutils.VerifyCertificates(hostname, domain, port)
 	}
 
 	<-limit
+}
+
+func splitDomainAndPort(domain string) (string, string) {
+	split := strings.Split(domain, ":")
+	if len(split) < 2 {
+		return split[0], "443"
+	}
+	return split[0], split[1]
 }

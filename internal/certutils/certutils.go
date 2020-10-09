@@ -2,12 +2,21 @@ package certutils
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net"
 	"time"
 )
 
-//GetCertificateExpiryDate is a function that makes connection, and probes domains certificates via tls.client
-func GetCertificateExpiryDate(hostname, domain, port string) (time.Time, error) {
+//VerifyCertificates launches certificate retrieval and test process.
+func VerifyCertificates(hostname, domain, port string) {
+	date, _ := getCertificateExpiryDate(hostname, domain, port)
+	fmt.Printf("%v:%v:%v - %v\n", hostname, domain, port, date)
+}
+
+//getCertificateExpiryDate connects to a server specified by hostname argument and port, and then creates tcp.Client connection to specified domain.
+//It is done so to prevent retrieving unimportant certificate like Cloudflare.
+//This method of connection also allows to check vhost's certificate that is otherwise unavailable on the network via domain name.
+func getCertificateExpiryDate(hostname, domain, port string) (time.Time, error) {
 	conn, err := net.Dial("tcp", hostname+":"+port)
 	defer conn.Close()
 
