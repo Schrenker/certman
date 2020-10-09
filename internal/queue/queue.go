@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/schrenker/certman/internal/certutils"
 	"github.com/schrenker/certman/internal/jsonparse"
 )
 
@@ -23,12 +24,13 @@ func EnqueueHosts(hosts map[string][]string, settings *jsonparse.Settings) {
 	close(limit)
 }
 
-func launchConnection(host string, domains []string, wg *sync.WaitGroup, limit chan struct{}) {
+func launchConnection(hostname string, domains []string, wg *sync.WaitGroup, limit chan struct{}) {
 	defer wg.Done()
 
-	fmt.Println(host)
-	for i := range domains {
-		fmt.Println(domains[i])
+	for _, domain := range domains {
+		date, _ := certutils.GetCertificateExpiryDate(hostname, domain, "443")
+		fmt.Printf("%v:%v:443 - %v\n", hostname, domain, date)
 	}
+
 	<-limit
 }
