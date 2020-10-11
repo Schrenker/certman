@@ -2,26 +2,28 @@ package certutils
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"net"
-	"time"
+
+	"github.com/schrenker/certman/internal/jsonparse"
 )
 
 //VerifyCertificates launches certificate retrieval and test process.
-func VerifyCertificates(hostname, domain, port string) {
-	date, _ := getCertificateExpiryDate(hostname, domain, port)
-	fmt.Printf("%v:%v:%v - %v\n", hostname, domain, port, date)
+func VerifyCertificates(vhost *jsonparse.Vhost) {
+	vhost.Certificate, vhost.Error = getCertificate(vhost.Hostname, vhost.Domain, vhost.Port)
+	fmt.Printf("%v:%v:%v -- %v\n", vhost.Hostname, vhost.Domain, vhost.Port, vhost.Certificate.NotAfter)
 }
 
 //getCertificateExpiryDate connects to a server specified by hostname argument and port, and then creates tcp.Client connection to specified domain.
 //It is done so to prevent retrieving unimportant certificate like Cloudflare.
 //This method of connection also allows to check vhost's certificate that is otherwise unavailable on the network via domain name.
-func getCertificateExpiryDate(hostname, domain, port string) (time.Time, error) {
+func getCertificate(hostname, domain, port string) (*x509.Certificate, error) {
 	conn, err := net.Dial("tcp", hostname+":"+port)
 	defer conn.Close()
 
 	if err != nil {
-		return time.Time{}, err
+		return &x509.Certificate{}, err
 	}
 
 	client := tls.Client(conn, &tls.Config{
@@ -30,8 +32,8 @@ func getCertificateExpiryDate(hostname, domain, port string) (time.Time, error) 
 	defer client.Close()
 
 	if err := client.Handshake(); err != nil {
-		return time.Time{}, err
+		return &x509.Certificate{}, err
 	}
 
-	return client.ConnectionState().PeerCertificates[0].NotAfter, nil
+	return client.ConnectionState().PeerCertificates[0], nil
 }
