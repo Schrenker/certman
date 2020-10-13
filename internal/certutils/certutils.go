@@ -35,3 +35,14 @@ func getCertificate(hostname, domain, port string) (*x509.Certificate, error) {
 
 	return client.ConnectionState().PeerCertificates[0], nil
 }
+
+//GetInvalidCertificatesSlice ...
+func GetInvalidCertificatesSlice(vhosts []*jsonparse.Vhost) []*jsonparse.Vhost {
+	errors := make([]*jsonparse.Vhost, 0)
+	for i := range vhosts {
+		if vhosts[i].Error != nil {
+			errors = append(errors, vhosts[i])
+		}
+	}
+	return errors
+}
