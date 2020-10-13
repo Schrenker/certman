@@ -10,20 +10,23 @@ import (
 	"github.com/schrenker/certman/pkg/validators"
 )
 
-//EnqueueHosts launches goroutines that take care of checking certificates on hosts
-func EnqueueHosts(hosts []*jsonparse.Vhost, settings *jsonparse.Settings) {
-	var wg sync.WaitGroup
-	wg.Add(len(hosts))
+type ControlGroup struct {
+	Wg    sync.WaitGroup
+	limit chan struct{}
+}
 
-	limit := make(chan struct{}, settings.ConcurrencyLimit) //limit amount of running jobs
+//EnqueueHosts launches goroutines that take care of checking certificates on hosts
+func EnqueueHosts(hosts []*jsonparse.Vhost, settings *jsonparse.Settings, controlGroup *ControlGroup) {
+	controlGroup.Wg.Add(len(hosts))
+
+	controlGroup.limit = make(chan struct{}, settings.ConcurrencyLimit) //limit amount of running jobs
 
 	for i := range hosts {
-		limit <- struct{}{}
-		go launchConnection(hosts[i], &wg, limit)
+		controlGroup.limit <- struct{}{}
+		go launchConnection(hosts[i], &controlGroup.Wg, controlGroup.limit)
 	}
 
-	wg.Wait()
-	close(limit)
+	close(controlGroup.limit)
 }
 
 func launchConnection(vhost *jsonparse.Vhost, wg *sync.WaitGroup, limit chan struct{}) {
@@ -38,7 +41,7 @@ func launchConnection(vhost *jsonparse.Vhost, wg *sync.WaitGroup, limit chan str
 	} else {
 		certutils.VerifyCertificates(vhost)
 	}
-	fmt.Printf("%v:%v:%v -- %v, %v\n", vhost.Hostname, vhost.Domain, vhost.Port, vhost.Certificate.NotAfter, vhost.Error)
+	fmt.Printf("%v:%v:%v - %v - %v\n", vhost.Hostname, vhost.Domain, vhost.Port, vhost.Certificate.NotAfter, vhost.Error)
 
 	<-limit
 }

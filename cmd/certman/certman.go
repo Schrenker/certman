@@ -15,11 +15,16 @@ func main() {
 
 	settings, _ := jsonparse.InitSettingsJSON("./configs/settings.json")
 
-	queue.EnqueueHosts(hosts, settings)
+	controlGroup := &queue.ControlGroup{}
+
+	queue.EnqueueHosts(hosts, settings, controlGroup)
+	controlGroup.Wg.Wait()
+	// errors := certutils.GetInvalidCertificatesSlice(hosts)
+	// for i := range errors {
+	// 	fmt.Println(errors[i].Error)
+	// }
 }
 
-// func verifyHostname() //Check if hostname is valid and points to an actual server
-// func verifyDomain() //Check if domain give is FQDN
 // func verifyCert() //Check if certificate is valid and if it matches domain
 // func parseResult() //Parse resulting date
 // func evaluateResult() //evaluate if there is risk of certificate expiring soon
