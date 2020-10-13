@@ -3,7 +3,6 @@ package certutils
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"fmt"
 	"net"
 
 	"github.com/schrenker/certman/internal/jsonparse"
@@ -12,7 +11,6 @@ import (
 //VerifyCertificates launches certificate retrieval and test process.
 func VerifyCertificates(vhost *jsonparse.Vhost) {
 	vhost.Certificate, vhost.Error = getCertificate(vhost.Hostname, vhost.Domain, vhost.Port)
-	fmt.Printf("%v:%v:%v -- %v\n", vhost.Hostname, vhost.Domain, vhost.Port, vhost.Certificate.NotAfter)
 }
 
 //getCertificateExpiryDate connects to a server specified by hostname argument and port, and then creates tcp.Client connection to specified domain.
