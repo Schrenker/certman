@@ -10,6 +10,7 @@ import (
 	"github.com/schrenker/certman/pkg/validators"
 )
 
+//ControlGroup ...
 type ControlGroup struct {
 	Wg    sync.WaitGroup
 	limit chan struct{}
@@ -41,7 +42,7 @@ func launchConnection(vhost *jsonparse.Vhost, wg *sync.WaitGroup, limit chan str
 	} else {
 		certutils.VerifyCertificates(vhost)
 	}
-	fmt.Printf("%v:%v:%v - %v - %v\n", vhost.Hostname, vhost.Domain, vhost.Port, vhost.Certificate.NotAfter, vhost.Error)
+	// fmt.Printf("%v:%v:%v - %v - %v\n", vhost.Hostname, vhost.Domain, vhost.Port, vhost.Certificate.NotAfter, vhost.Error)
 
 	<-limit
 }

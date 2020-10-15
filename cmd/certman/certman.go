@@ -23,6 +23,10 @@ func main() {
 	// for i := range errors {
 	// 	fmt.Println(errors[i].Error)
 	// }
+	// certsThirty := certutils.GetCertsExpiringInDays(30, hosts)
+	// for i := range certsThirty {
+	// 	fmt.Printf("%v:%v:%v - %v - %v\n", certsThirty[i].Hostname, certsThirty[i].Domain, certsThirty[i].Port, certsThirty[i].Certificate.NotAfter, certsThirty[i].Error)
+	// }
 }
 
 // func verifyCert() //Check if certificate is valid and if it matches domain

@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"net"
+	"time"
 
 	"github.com/schrenker/certman/internal/jsonparse"
 )
@@ -45,4 +46,16 @@ func GetInvalidCertificatesSlice(vhosts []*jsonparse.Vhost) []*jsonparse.Vhost {
 		}
 	}
 	return errors
+}
+
+//GetCertsExpiringInDays ...
+func GetCertsExpiringInDays(days uint64, vhosts []*jsonparse.Vhost) []*jsonparse.Vhost {
+	expiringCerts := make([]*jsonparse.Vhost, 0)
+	expiryDate := time.Now().Add(time.Duration(days*24) * time.Hour)
+	for i := range vhosts {
+		if vhosts[i].Certificate.NotAfter.Before(expiryDate) && vhosts[i].Error == nil {
+			expiringCerts = append(expiringCerts, vhosts[i])
+		}
+	}
+	return expiringCerts
 }
