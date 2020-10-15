@@ -17,7 +17,7 @@ func main() {
 
 	controlGroup := &queue.ControlGroup{}
 
-	queue.EnqueueHosts(hosts, settings, controlGroup)
+	queue.EnqueueHosts(hosts, settings.ConcurrencyLimit, controlGroup)
 	controlGroup.Wg.Wait()
 	// errors := certutils.GetInvalidCertificatesSlice(hosts)
 	// for i := range errors {

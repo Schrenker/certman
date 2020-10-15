@@ -10,10 +10,15 @@ import (
 
 //Settings is a struct representing all settings options available.
 type Settings struct {
-	Mail             string `json:"mail"`             //default nil
-	ConcurrencyLimit int    `json:"concurrencyLimit"` //default 10
+	EmailAddr        string   `json:"emailAddr"`        //default ""
+	EmailPass        string   `json:"emailPass"`        //default ""
+	EmailServer      string   `json:"emailServer"`      //default ""
+	EmailPort        string   `json:"emailPort"`        //default ""
+	ConcurrencyLimit uint     `json:"concurrencyLimit"` //default 20
+	Days             []uint16 `json:"days"`             //default [1, 7, 14]
 }
 
+//Vhost ...
 type Vhost struct {
 	Hostname    string
 	Domain      string
@@ -29,8 +34,12 @@ func InitSettingsJSON(path string) (*Settings, error) {
 	err := parseJSONFile(path, &settings)
 	if err != nil {
 		return &Settings{
-			Mail:             "",
-			ConcurrencyLimit: 10,
+			EmailAddr:        "",
+			EmailPass:        "",
+			EmailServer:      "",
+			EmailPort:        "",
+			ConcurrencyLimit: 20,
+			Days:             []uint16{1, 7, 14},
 		}, err
 	}
 
