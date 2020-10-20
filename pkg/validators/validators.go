@@ -40,3 +40,6 @@ func CheckIfIPv4(ip string) bool {
 	}
 	return true
 }
+
+// func CheckIfValidPort(port interface{}) bool {}
+// func CheckIfValidEmail(email string) bool {}

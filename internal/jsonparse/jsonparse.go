@@ -14,7 +14,7 @@ type Settings struct {
 	EmailPass        string   `json:"emailPass"`        //default ""
 	EmailServer      string   `json:"emailServer"`      //default ""
 	EmailPort        string   `json:"emailPort"`        //default ""
-	ConcurrencyLimit uint     `json:"concurrencyLimit"` //default 20
+	ConcurrencyLimit uint8    `json:"concurrencyLimit"` //default 20
 	Days             []uint16 `json:"days"`             //default [1, 7, 14]
 }
 

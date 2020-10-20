@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
+	"github.com/schrenker/certman/internal/certutils"
 	"github.com/schrenker/certman/internal/jsonparse"
 	"github.com/schrenker/certman/internal/queue"
 )
@@ -19,17 +21,12 @@ func main() {
 
 	queue.EnqueueHosts(hosts, settings.ConcurrencyLimit, controlGroup)
 	controlGroup.Wg.Wait()
-	// errors := certutils.GetInvalidCertificatesSlice(hosts)
-	// for i := range errors {
-	// 	fmt.Println(errors[i].Error)
-	// }
-	// certsThirty := certutils.GetCertsExpiringInDays(30, hosts)
-	// for i := range certsThirty {
-	// 	fmt.Printf("%v:%v:%v - %v - %v\n", certsThirty[i].Hostname, certsThirty[i].Domain, certsThirty[i].Port, certsThirty[i].Certificate.NotAfter, certsThirty[i].Error)
-	// }
+
+	thirty := certutils.GetCertsExpiringInDays(30, hosts)
+	for i := range thirty {
+		fmt.Printf("%v %v %v\n", thirty[i].Hostname, thirty[i].Domain, thirty[i].Certificate.NotAfter)
+	}
 }
 
 // func verifyCert() //Check if certificate is valid and if it matches domain
-// func parseResult() //Parse resulting date
-// func evaluateResult() //evaluate if there is risk of certificate expiring soon
 // func sendMail() //Send mail if there are risky certificates

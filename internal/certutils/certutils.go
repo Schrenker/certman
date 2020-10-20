@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"net"
+	"sort"
 	"time"
 
 	"github.com/schrenker/certman/internal/jsonparse"
@@ -57,5 +58,8 @@ func GetCertsExpiringInDays(days uint64, vhosts []*jsonparse.Vhost) []*jsonparse
 			expiringCerts = append(expiringCerts, vhosts[i])
 		}
 	}
+	sort.SliceStable(expiringCerts, func(i, j int) bool {
+		return expiringCerts[i].Certificate.NotAfter.Sub(expiringCerts[j].Certificate.NotAfter) > 0
+	})
 	return expiringCerts
 }

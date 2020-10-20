@@ -17,7 +17,7 @@ type ControlGroup struct {
 }
 
 //EnqueueHosts launches goroutines that take care of checking certificates on hosts
-func EnqueueHosts(hosts []*jsonparse.Vhost, concurrencyLimit uint, controlGroup *ControlGroup) {
+func EnqueueHosts(hosts []*jsonparse.Vhost, concurrencyLimit uint8, controlGroup *ControlGroup) {
 	controlGroup.Wg.Add(len(hosts))
 
 	controlGroup.limit = make(chan struct{}, concurrencyLimit) //limit amount of running jobs
