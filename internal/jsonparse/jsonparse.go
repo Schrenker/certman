@@ -14,6 +14,7 @@ type Settings struct {
 	EmailPass        string   `json:"emailPass"`        //default ""
 	EmailServer      string   `json:"emailServer"`      //default ""
 	EmailPort        string   `json:"emailPort"`        //default ""
+	EmailDest        []string `json:"emailDest"`        //default []
 	ConcurrencyLimit uint8    `json:"concurrencyLimit"` //default 20
 	Days             []uint16 `json:"days"`             //default [1, 7, 14]
 }
@@ -38,6 +39,7 @@ func InitSettingsJSON(path string) (*Settings, error) {
 			EmailPass:        "",
 			EmailServer:      "",
 			EmailPort:        "",
+			EmailDest:        []string{},
 			ConcurrencyLimit: 20,
 			Days:             []uint16{1, 7, 14},
 		}, err
@@ -45,6 +47,8 @@ func InitSettingsJSON(path string) (*Settings, error) {
 
 	return &settings, nil
 }
+
+// func removeInvalidDays(days []uint16) { }
 
 //InitHostsJSON parses json hosts file into string:[]string map
 func InitHostsJSON(path string) ([]*Vhost, error) {
