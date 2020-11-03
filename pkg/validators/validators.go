@@ -53,7 +53,7 @@ func CheckIfValidPort(port interface{}) bool {
 		return false
 	case string:
 		numeric, _ := strconv.Atoi(v)
-		if numeric < 0 && numeric <= 65535 {
+		if numeric > 0 && numeric <= 65535 {
 			return true
 		}
 		return false

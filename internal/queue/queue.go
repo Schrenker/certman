@@ -10,13 +10,19 @@ import (
 	"github.com/schrenker/certman/pkg/validators"
 )
 
-//ControlGroup ...
+//ControlGroup is a struct containing wait group and channel semaphore
 type ControlGroup struct {
 	Wg    sync.WaitGroup
 	limit chan struct{}
 }
 
 //EnqueueHosts launches goroutines that take care of checking certificates on hosts
+//
+//First argument is an array of vhosts in hostname:domain:port format
+//
+//Second Argument takes number to which concurrent jobs will be limited
+//
+//Third arguments takes a pointer to ControlGroup struct
 func EnqueueHosts(hosts []*jsonparse.Vhost, concurrencyLimit uint8, controlGroup *ControlGroup) {
 	controlGroup.Wg.Add(len(hosts))
 
@@ -34,13 +40,20 @@ func launchConnection(vhost *jsonparse.Vhost, wg *sync.WaitGroup, limit chan str
 	defer wg.Done()
 
 	if !(validators.CheckIfFQDN(vhost.Hostname) || validators.CheckIfIPv4(vhost.Hostname)) {
-		vhost.Certificate = &x509.Certificate{}
 		vhost.Error = fmt.Errorf("%v is not a valid domain or IP address", vhost.Hostname)
+
 	} else if !validators.CheckIfFQDN(vhost.Domain) {
-		vhost.Certificate = &x509.Certificate{}
 		vhost.Error = fmt.Errorf("%v is not a valid domain", vhost.Domain)
+
+	} else if !validators.CheckIfValidPort(vhost.Port) {
+		vhost.Error = fmt.Errorf("%v is not a valid port", vhost.Port)
+
 	} else {
 		certutils.VerifyCertificates(vhost)
+	}
+
+	if vhost.Certificate == nil {
+		vhost.Certificate = &x509.Certificate{}
 	}
 	<-limit
 }
