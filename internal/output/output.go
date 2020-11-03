@@ -15,8 +15,8 @@ import (
 func Sendmail(settings *jsonparse.Settings, messages [][]*jsonparse.Vhost) error {
 
 	message := prepareBodyBytes(settings.Days, messages)
-
 	auth := smtp.PlainAuth("", settings.EmailAddr, settings.EmailPass, settings.EmailServer)
+
 	err := smtp.SendMail(
 		settings.EmailServer+":"+settings.EmailPort,
 		auth,
@@ -24,10 +24,10 @@ func Sendmail(settings *jsonparse.Settings, messages [][]*jsonparse.Vhost) error
 		settings.EmailDest,
 		message,
 	)
-
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

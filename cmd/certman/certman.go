@@ -11,14 +11,23 @@ import (
 	"github.com/schrenker/certman/internal/queue"
 )
 
+const usage = `certman - certificate monitoring utility - github.com/schrenker/certman
+
+Usage: certman -h [FILE] -s [FILE] -m [BOOL]
+-h - Path to hosts.json file. Defaults to ./hosts.json. This file is required.
+-s - Path to settings.json file. Defaults to ./settings.json. Optional
+-m - Flag specifying if mail is to be sent. Defaults to false. Optional
+`
+
 func main() {
-	hostsFlag := flag.String("h", "./configs/hosts.json", "Specify location for hosts json file. Defaults to ./config/hosts")
-	settingsFlag := flag.String("s", "./configs/settings.json", "Specify location for settings json file. Defaults to ./config/settings")
+	hostsFlag := flag.String("h", "./hosts.json", "Specify location for hosts json file. Defaults to ./config/hosts")
+	settingsFlag := flag.String("s", "./settings.json", "Specify location for settings json file. Defaults to ./config/settings")
 	mailFlag := flag.Bool("m", false, "Send mail with credentials used in settings.json file. Default to false")
 	flag.Parse()
 
 	hosts, err := jsonparse.InitHostsJSON(*hostsFlag)
 	if err != nil {
+		fmt.Println(usage)
 		fmt.Println("No hosts file provided, exiting...")
 		os.Exit(20)
 	}
@@ -38,7 +47,6 @@ func main() {
 			os.Exit(30)
 		}
 	} else {
-		body := output.PrepareBody(settings.Days, finalList)
-		fmt.Print(body)
+		fmt.Print(output.PrepareBody(settings.Days, finalList))
 	}
 }
