@@ -60,7 +60,6 @@ func InitHostsJSON(path string) ([]*Vhost, error) {
 	return hostsMapToStructArray(hosts), nil
 }
 
-//ParseJSON
 func parseJSONFile(path string, v interface{}) error {
 	jsonFile, err := os.Open(path)
 	if err != nil {
