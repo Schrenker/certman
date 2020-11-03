@@ -7,7 +7,11 @@ import (
 	"github.com/schrenker/certman/internal/jsonparse"
 )
 
-// Sendmail takes care of authentication and sends request for message to be formatted, then sends it
+//Sendmail fetches byte array from prepareBodyBytes, authenticates using credentials from seetings.json and sends email
+//
+//First argument takes a pointer to settings struct, used for SMTP authentication
+//
+//Second arguments is an array of vhost arrays, already segregated according to days array
 func Sendmail(settings *jsonparse.Settings, messages [][]*jsonparse.Vhost) error {
 
 	message := prepareBodyBytes(settings.Days, messages)
@@ -40,7 +44,7 @@ func prepareBodyBytes(days []uint16, messages [][]*jsonparse.Vhost) []byte {
 					messages[i][j].Hostname,
 					messages[i][j].Domain,
 					messages[i][j].Port,
-					messages[i][j].Certificate.NotAfter))...)
+					messages[i][j].Certificate.NotAfter.Format("02-01-2006 15:04")))...)
 			}
 			buffer = append(buffer, []byte("\n")...)
 		}
@@ -59,7 +63,11 @@ func prepareBodyBytes(days []uint16, messages [][]*jsonparse.Vhost) []byte {
 	return buffer
 }
 
-//PrepareBody ...
+//PrepareBody is used when email is not send by certman. Takes care of formatting whole output as string.
+//
+//First argument is uint16 array that contain days "breakpoints" used as range for composing the final output.
+//
+//Second arguments is an array of vhost arrays, already segregated according to days array
 func PrepareBody(days []uint16, messages [][]*jsonparse.Vhost) string {
 	buffer := ""
 
@@ -71,7 +79,7 @@ func PrepareBody(days []uint16, messages [][]*jsonparse.Vhost) string {
 					messages[i][j].Hostname,
 					messages[i][j].Domain,
 					messages[i][j].Port,
-					messages[i][j].Certificate.NotAfter)
+					messages[i][j].Certificate.NotAfter.Format("02-01-2006 15:04"))
 			}
 			buffer = buffer + "\n"
 		}
