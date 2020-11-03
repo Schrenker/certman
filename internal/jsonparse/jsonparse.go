@@ -19,7 +19,7 @@ type Settings struct {
 	Days             []uint16 `json:"days"`             //default [1, 7, 14]
 }
 
-//Vhost ...
+//Vhost is a struct that is composed of all vhost data necessary for program use
 type Vhost struct {
 	Hostname    string
 	Domain      string
@@ -28,7 +28,7 @@ type Vhost struct {
 	Error       error
 }
 
-//InitSettingsJSON is a function that parses settings.json file to Settings struct
+//InitSettingsJSON is a function that parses settings.json file to Settings struct. The only argument is string path to settings.json file.
 func InitSettingsJSON(path string) (*Settings, error) {
 	var settings Settings
 
@@ -48,9 +48,7 @@ func InitSettingsJSON(path string) (*Settings, error) {
 	return &settings, nil
 }
 
-// func removeInvalidDays(days []uint16) { }
-
-//InitHostsJSON parses json hosts file into string:[]string map
+//InitHostsJSON parses json hosts file into string:[]string map. The only argument is string path to hosts.json file
 func InitHostsJSON(path string) ([]*Vhost, error) {
 	var hosts map[string][]string
 
