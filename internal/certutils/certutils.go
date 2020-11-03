@@ -63,12 +63,26 @@ func getCertsExpiringInDays(days uint16, vhosts []*jsonparse.Vhost) []*jsonparse
 	return expiringCerts
 }
 
+func cutDuplicates(vhosts [][]*jsonparse.Vhost) {
+	length := len(vhosts)
+	if length < 2 {
+		return
+	}
+	combinedLength := 0
+	for i := 1; i < length; i++ {
+		combinedLength = combinedLength + len(vhosts[i-1])
+		vhosts[i] = vhosts[i][combinedLength:]
+	}
+}
+
 func GetFinishedCertificateList(days []uint16, vhosts []*jsonparse.Vhost) [][]*jsonparse.Vhost {
 	finalList := make([][]*jsonparse.Vhost, 0)
 
 	for i := range days {
 		finalList = append(finalList, getCertsExpiringInDays(days[i], vhosts))
 	}
+
+	cutDuplicates(finalList)
 
 	finalList = append(finalList, getInvalidCertificatesSlice(vhosts))
 
