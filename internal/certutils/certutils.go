@@ -18,6 +18,12 @@ func VerifyCertificates(vhost *jsonparse.Vhost) {
 //getCertificateExpiryDate connects to a server specified by hostname argument and port, and then creates tcp.Client connection to specified domain.
 //It is done so to prevent retrieving unimportant certificate like Cloudflare.
 //This method of connection also allows to check vhost's certificate that is otherwise unavailable on the network via domain name.
+//
+//First argument is a server to which we are connecting
+//
+//Second argument is domain of which we are checking certificate
+//
+//Third argument is port to which we are connecting
 func getCertificate(hostname, domain, port string) (*x509.Certificate, error) {
 	conn, err := net.Dial("tcp", hostname+":"+port)
 	defer conn.Close()
@@ -38,7 +44,9 @@ func getCertificate(hostname, domain, port string) (*x509.Certificate, error) {
 	return client.ConnectionState().PeerCertificates[0], nil
 }
 
-//GetInvalidCertificatesSlice ...
+//GetInvalidCertificatesSlice returns a slice containing only invalid certificates and entries which failed
+//
+//Function takes one argument, which is a list of all vhosts
 func getInvalidCertificatesSlice(vhosts []*jsonparse.Vhost) []*jsonparse.Vhost {
 	errors := make([]*jsonparse.Vhost, 0)
 	for i := range vhosts {
@@ -75,7 +83,11 @@ func cutDuplicates(vhosts [][]*jsonparse.Vhost) {
 	}
 }
 
-//GetFinishedCertificateList ...
+//GetFinishedCertificateList composes array of vhost arrays, containing all fetches certificates, categorized via "days" breakpoints.
+//
+//First argument is days array, which break up list into manageable chunks
+//
+//Second argument is array of all vhosts
 func GetFinishedCertificateList(days []uint16, vhosts []*jsonparse.Vhost) [][]*jsonparse.Vhost {
 	finalList := make([][]*jsonparse.Vhost, 0)
 
