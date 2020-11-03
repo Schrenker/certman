@@ -39,7 +39,7 @@ func getCertificate(hostname, domain, port string) (*x509.Certificate, error) {
 }
 
 //GetInvalidCertificatesSlice ...
-func GetInvalidCertificatesSlice(vhosts []*jsonparse.Vhost) []*jsonparse.Vhost {
+func getInvalidCertificatesSlice(vhosts []*jsonparse.Vhost) []*jsonparse.Vhost {
 	errors := make([]*jsonparse.Vhost, 0)
 	for i := range vhosts {
 		if vhosts[i].Error != nil {
@@ -49,8 +49,7 @@ func GetInvalidCertificatesSlice(vhosts []*jsonparse.Vhost) []*jsonparse.Vhost {
 	return errors
 }
 
-//GetCertsExpiringInDays ...
-func GetCertsExpiringInDays(days uint64, vhosts []*jsonparse.Vhost) []*jsonparse.Vhost {
+func getCertsExpiringInDays(days uint16, vhosts []*jsonparse.Vhost) []*jsonparse.Vhost {
 	expiringCerts := make([]*jsonparse.Vhost, 0)
 	expiryDate := time.Now().Add(time.Duration(days*24) * time.Hour)
 	for i := range vhosts {
@@ -59,7 +58,19 @@ func GetCertsExpiringInDays(days uint64, vhosts []*jsonparse.Vhost) []*jsonparse
 		}
 	}
 	sort.SliceStable(expiringCerts, func(i, j int) bool {
-		return expiringCerts[i].Certificate.NotAfter.Sub(expiringCerts[j].Certificate.NotAfter) > 0
+		return expiringCerts[i].Certificate.NotAfter.Sub(expiringCerts[j].Certificate.NotAfter) < 0
 	})
 	return expiringCerts
+}
+
+func GetFinishedCertificateList(days []uint16, vhosts []*jsonparse.Vhost) [][]*jsonparse.Vhost {
+	finalList := make([][]*jsonparse.Vhost, 0)
+
+	for i := range days {
+		finalList = append(finalList, getCertsExpiringInDays(days[i], vhosts))
+	}
+
+	finalList = append(finalList, getInvalidCertificatesSlice(vhosts))
+
+	return finalList
 }
