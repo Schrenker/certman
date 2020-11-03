@@ -1,4 +1,4 @@
-package sendmail
+package output
 
 import (
 	"fmt"
@@ -8,9 +8,9 @@ import (
 )
 
 // Sendmail takes care of authentication and sends request for message to be formatted, then sends it
-func Sendmail(settings *jsonparse.Settings, messages [][]*jsonparse.Vhost) {
+func Sendmail(settings *jsonparse.Settings, messages [][]*jsonparse.Vhost) error {
 
-	message := _PrepareBody(settings.Days, messages)
+	message := prepareBodyBytes(settings.Days, messages)
 
 	auth := smtp.PlainAuth("", settings.EmailAddr, settings.EmailPass, settings.EmailServer)
 	err := smtp.SendMail(
@@ -22,12 +22,15 @@ func Sendmail(settings *jsonparse.Settings, messages [][]*jsonparse.Vhost) {
 	)
 
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
+	return nil
 }
 
-func _PrepareBody(days []uint16, messages [][]*jsonparse.Vhost) []byte {
+func prepareBodyBytes(days []uint16, messages [][]*jsonparse.Vhost) []byte {
 	buffer := make([]byte, 0)
+
+	buffer = append(buffer, []byte("Subject: Certificate expiration check")...)
 
 	if len(days) > 0 {
 		for i := range days {
@@ -56,6 +59,7 @@ func _PrepareBody(days []uint16, messages [][]*jsonparse.Vhost) []byte {
 	return buffer
 }
 
+//PrepareBody ...
 func PrepareBody(days []uint16, messages [][]*jsonparse.Vhost) string {
 	buffer := ""
 
