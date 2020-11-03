@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -11,12 +12,17 @@ import (
 )
 
 func main() {
-	hosts, err := jsonparse.InitHostsJSON("./configs/hosts.json")
+	hostsFlag := flag.String("h", "./configs/hosts.json", "Specify location for hosts json file. Defaults to ./config/hosts")
+	settingsFlag := flag.String("s", "./config/settings.json", "Specify location for settings json file. Defaults to ./config/settings")
+	flag.Parse()
+
+	hosts, err := jsonparse.InitHostsJSON(*hostsFlag)
 	if err != nil {
+		fmt.Println("No hosts file provided, exiting...")
 		os.Exit(20) //code 20 mean no hosts file provided, which is required for program to run
 	}
 
-	settings, _ := jsonparse.InitSettingsJSON("./configs/settings.json")
+	settings, _ := jsonparse.InitSettingsJSON(*settingsFlag)
 
 	controlGroup := &queue.ControlGroup{}
 	queue.EnqueueHosts(hosts, settings.ConcurrencyLimit, controlGroup)
@@ -30,8 +36,4 @@ func main() {
 		body := sendmail.PrepareBody(settings.Days, finalList)
 		fmt.Print(string(body))
 	}
-
 }
-
-// func verifyCert() //Check if certificate is valid and if it matches domain
-// func sendMail() //Send mail if there are risky certificates
