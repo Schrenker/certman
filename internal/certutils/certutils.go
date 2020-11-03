@@ -75,6 +75,7 @@ func cutDuplicates(vhosts [][]*jsonparse.Vhost) {
 	}
 }
 
+//GetFinishedCertificateList ...
 func GetFinishedCertificateList(days []uint16, vhosts []*jsonparse.Vhost) [][]*jsonparse.Vhost {
 	finalList := make([][]*jsonparse.Vhost, 0)
 

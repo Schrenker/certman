@@ -10,7 +10,7 @@ import (
 //Sendmail takes care of authentication and sends request for message to be formatted, then sends it
 func Sendmail(settings *jsonparse.Settings, messages [][]*jsonparse.Vhost) {
 
-	message := prepareMail(settings.Days, messages)
+	message := PrepareBody(settings.Days, messages)
 
 	auth := smtp.PlainAuth("", settings.EmailAddr, settings.EmailPass, settings.EmailServer)
 	err := smtp.SendMail(
@@ -26,7 +26,7 @@ func Sendmail(settings *jsonparse.Settings, messages [][]*jsonparse.Vhost) {
 	}
 }
 
-func prepareMail(days []uint16, messages [][]*jsonparse.Vhost) []byte {
+func PrepareBody(days []uint16, messages [][]*jsonparse.Vhost) []byte {
 	buffer := make([]byte, 0)
 
 	subject := "Subject: Weekly certificate check!\n"

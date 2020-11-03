@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/schrenker/certman/internal/certutils"
@@ -23,7 +24,13 @@ func main() {
 
 	finalList := certutils.GetFinishedCertificateList(settings.Days, hosts)
 
-	sendmail.Sendmail(settings, finalList)
+	if len(settings.EmailServer) > 0 {
+		sendmail.Sendmail(settings, finalList)
+	} else {
+		body := sendmail.PrepareBody(settings.Days, finalList)
+		fmt.Print(string(body))
+	}
+
 }
 
 // func verifyCert() //Check if certificate is valid and if it matches domain
