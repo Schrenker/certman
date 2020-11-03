@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -25,6 +26,7 @@ func CheckIfFQDN(domain string) bool {
 	return match
 }
 
+//CheckIfIPv4 validates if correct ipv4 is provided
 func CheckIfIPv4(ip string) bool {
 	octets := strings.Split(ip, ".")
 	if len(octets) != 4 {
@@ -41,5 +43,22 @@ func CheckIfIPv4(ip string) bool {
 	return true
 }
 
-// func CheckIfValidPort(port interface{}) bool {}
-// func CheckIfValidEmail(email string) bool {}
+//CheckIfValidPort validates if given port is correct. Currently support string and int format
+func CheckIfValidPort(port interface{}) bool {
+	switch v := port.(type) {
+	case int:
+		if v < 0 && v <= 65535 {
+			return true
+		}
+		return false
+	case string:
+		numeric, _ := strconv.Atoi(v)
+		if numeric < 0 && numeric <= 65535 {
+			return true
+		}
+		return false
+	default:
+		fmt.Println("Unknown type")
+		return false
+	}
+}
