@@ -26,11 +26,10 @@ func VerifyCertificates(vhost *jsonparse.Vhost) {
 //Third argument is port to which we are connecting
 func getCertificate(hostname, domain, port string) (*x509.Certificate, error) {
 	conn, err := net.Dial("tcp", hostname+":"+port)
-	defer conn.Close()
-
 	if err != nil {
 		return &x509.Certificate{}, err
 	}
+	defer conn.Close()
 
 	client := tls.Client(conn, &tls.Config{
 		ServerName: domain,
